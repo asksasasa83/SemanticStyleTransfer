@@ -114,6 +114,7 @@ class NeuralStyle:
                     print("Iteration: {:3d}\tLoss = {:.6f}".format(it, ll))
             
             elif self._optimizer == 'L-BFGS':
+                sess.run(tf.global_variables_initializer())
                 self._set_initial_image(sess, image, content)
                 self._step_callback(sess.run(image))
 
@@ -121,7 +122,9 @@ class NeuralStyle:
                         'maxiter': self._num_iterations,
                         'disp': self._print_iter}, method='L-BFGS-B')
                 opt.minimize(sess, step_callback=self._step_callback)
-            
+            else:
+                raise ValueError("Unknown optimization method")
+
             self._save_image(self._output_image, sess.run(image))
 
     def _set_initial_image(self, sess, image, content):

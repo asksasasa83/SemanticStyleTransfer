@@ -2,6 +2,7 @@ from itertools import product
 import neural_style
 import os
 import gc
+import subprocess
 
 CONTENT = 'examples/input/tubingen.jpg'
 STYLE = 'examples/input/starry-night.jpg'
@@ -12,10 +13,10 @@ STYLE_LAYERS = ['conv1_1,conv2_1,conv3_1,conv4_1,conv5_1',
             'conv1_2,conv2_2,conv3_2,conv4_2,conv5_2',
             'conv1_2,conv2_2,conv3_4,conv4_4,conv5_4']
 INIT=['random', 'image']
-STYLE_WEIGHTS = [5, 100, 500, 2000]
+STYLE_WEIGHTS = ['5', '100', '500', '2000']
 OPTIMIZERS = ['Adam', 'L-BFGS']
-NUM_ITERATIONS = 800
-TV_WEIGHTS = [0.00001, 0.0001, 0.001]
+NUM_ITERATIONS = '1000'
+TV_WEIGHTS = ['0.00001', '0.1', '10']
 
 
 def maybe_create_subfolders(folder):
@@ -29,41 +30,44 @@ if __name__ == '__main__':
 
         filename = os.path.basename(CONTENT)[:-4] + '_' + os.path.basename(STYLE)[:-4] + '.jpg'
         try:
-            neural_style.NeuralStyle(
-                content_image=CONTENT,
-                content_layers=cont,
-                content_weight=5e0,
-                image_size=500,
-                init = init,
-                num_iterations=NUM_ITERATIONS,
-                output_image=os.path.join(folder_name, filename),
-                print_iter=50,
-                save_iter=50,
-                style_image=STYLE,
-                style_layers=style,
-                style_weight=style_weight,
-                tv_weight=tv_weight,
-                optimizer=optimizer
-            ).run()
-        except:
-            gc.collect()
-            try:
-                neural_style.NeuralStyle(
-                    content_image=CONTENT,
-                    content_layers=cont,
-                    content_weight=5e0,
-                    image_size=500,
-                    init = init,
-                    num_iterations=NUM_ITERATIONS,
-                    output_image=os.path.join(folder_name, filename),
-                    print_iter=50,
-                    save_iter=50,
-                    style_image=STYLE,
-                    style_layers=style,
-                    style_weight=style_weight,
-                    tv_weight=tv_weight,
-                    optimizer=optimizer
-                ).run()
-            except:
-                pass
+            print('Executing: ', cont, ' ', init, ' ', style, ' ', style_weight, ' ', tv_weight, ' ', optimizer)
+            subprocess.check_output(['python', 'neural_style.py', '--content_image', CONTENT, '--content_layers', cont, '--init', init, '--num_iterations', NUM_ITERATIONS, '--output_image', os.path.join(folder_name, filename),'--print_iter','50', '--save_iter', '50', '--style_image', STYLE, '--style_layers', style, '--style_weight', style_weight, '--tv_weight', tv_weight, '--optimizer', optimizer], stderr=subprocess.STDOUT)
+            #neural_style.NeuralStyle(
+            #    content_image=CONTENT,
+            #    content_layers=cont,
+            #    content_weight=5e0,
+            #    image_size=500,
+            #    init = init,
+            #    num_iterations=NUM_ITERATIONS,
+            #    output_image=os.path.join(folder_name, filename),
+            #    print_iter=50,
+            #    save_iter=50,
+            #    style_image=STYLE,
+            #    style_layers=style,
+            #    style_weight=style_weight,
+            #    tv_weight=tv_weight,
+            #    optimizer=optimizer
+            #).run()
+        except Exception as e:
+            raise e
+            #gc.collect()
+            #try:
+            #    neural_style.NeuralStyle(
+            #        content_image=CONTENT,
+            #        content_layers=cont,
+            #        content_weight=5e0,
+            #        image_size=500,
+            #        init = init,
+            #        num_iterations=NUM_ITERATIONS,
+            #        output_image=os.path.join(folder_name, filename),
+            #        print_iter=50,
+            #        save_iter=50,
+            #        style_image=STYLE,
+            #        style_layers=style,
+            #        style_weight=style_weight,
+            #        tv_weight=tv_weight,
+            #        optimizer=optimizer
+            #    ).run()
+            #except:
+            #    pass
        
