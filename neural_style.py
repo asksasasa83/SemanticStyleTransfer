@@ -106,6 +106,8 @@ class NeuralStyle:
                 sess.run(tf.global_variables_initializer())
                 self._set_initial_image(sess, image, content)
 
+                self._step_callback(sess.run(image))
+
                 for it in range(self._num_iterations):
                     _,ll, out = sess.run([opt, loss, image])
                     self._step_callback(out)
@@ -113,6 +115,8 @@ class NeuralStyle:
             
             elif self._optimizer == 'L-BFGS':
                 self._set_initial_image(sess, image, content)
+                self._step_callback(sess.run(image))
+
                 opt = ScipyOptimizerInterface(loss, options={
                         'maxiter': self._num_iterations,
                         'disp': self._print_iter}, method='L-BFGS-B')
@@ -209,14 +213,14 @@ class NeuralStyle:
         return output
 
 
-    def _step_callback(self, variables_vector):
-        self._step_counter += 1
-        if (self._step_counter % self._save_iter == 0 and
-                self._step_counter != self._num_iterations):
+    def _step_callback(self, variables_vector): 
+        if (self._step_counter % self._save_iter == 0):
             root, ext = os.path.splitext(self._output_image)
             filename = '%s_%04d%s' % (root, self._step_counter, ext)
             image = np.copy(variables_vector).reshape(self._output_shape)
             self._save_image(filename, image)
+        
+        self._step_counter += 1
 
 
     def _load_image(self, filename, size=None):
