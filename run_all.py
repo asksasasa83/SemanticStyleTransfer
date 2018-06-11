@@ -1,6 +1,7 @@
 from itertools import product
 import neural_style
 import os
+import gc
 
 CONTENT = 'examples/input/tubingen.jpg'
 STYLE = 'examples/input/starry-night.jpg'
@@ -13,8 +14,8 @@ STYLE_LAYERS = ['conv1_1,conv2_1,conv3_1,conv4_1,conv5_1',
 INIT=['random', 'image']
 STYLE_WEIGHTS = [5, 100, 500, 2000]
 OPTIMIZERS = ['Adam', 'L-BFGS']
-NUM_ITERATIONS = 500
-TV_WEIGHTS = [0.0001, 0.1, 20]
+NUM_ITERATIONS = 800
+TV_WEIGHTS = [0.00001, 0.0001, 0.001]
 
 
 def maybe_create_subfolders(folder):
@@ -27,21 +28,42 @@ if __name__ == '__main__':
         maybe_create_subfolders(folder_name)
 
         filename = os.path.basename(CONTENT)[:-4] + '_' + os.path.basename(STYLE)[:-4] + '.jpg'
-
-        neural_style.NeuralStyle(
-            content_image=CONTENT,
-            content_layers=cont,
-            content_weight=5e0,
-            image_size=500,
-            init = init,
-            num_iterations=NUM_ITERATIONS,
-            output_image=os.path.join(folder_name, filename),
-            print_iter=50,
-            save_iter=50,
-            style_image=STYLE,
-            style_layers=style,
-            style_weight=style_weight,
-            tv_weight=tv_weight,
-            optimizer=optimizer
-        ).run()
+        try:
+            neural_style.NeuralStyle(
+                content_image=CONTENT,
+                content_layers=cont,
+                content_weight=5e0,
+                image_size=500,
+                init = init,
+                num_iterations=NUM_ITERATIONS,
+                output_image=os.path.join(folder_name, filename),
+                print_iter=50,
+                save_iter=50,
+                style_image=STYLE,
+                style_layers=style,
+                style_weight=style_weight,
+                tv_weight=tv_weight,
+                optimizer=optimizer
+            ).run()
+        except:
+            gc.collect()
+            try:
+                neural_style.NeuralStyle(
+                    content_image=CONTENT,
+                    content_layers=cont,
+                    content_weight=5e0,
+                    image_size=500,
+                    init = init,
+                    num_iterations=NUM_ITERATIONS,
+                    output_image=os.path.join(folder_name, filename),
+                    print_iter=50,
+                    save_iter=50,
+                    style_image=STYLE,
+                    style_layers=style,
+                    style_weight=style_weight,
+                    tv_weight=tv_weight,
+                    optimizer=optimizer
+                ).run()
+            except:
+                pass
        
