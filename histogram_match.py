@@ -11,8 +11,9 @@ def remap_histogram(image, style):
 def get_hist_from_img(img):
     img_linearized = tf.reshape(img, (-1,))
     bincounts = tf.bincount(img_linearized, minlength=256)
-    bincounts = bincounts / img_linearized.get_shape()
-    return tf.cumsum(bincounts)
+    #bincounts = bincounts / tf.shape(img_linearized)[0]
+    sum_bincounts = tf.cumsum(bincounts)
+    return tf.cast(sum_bincounts / sum_bincounts[-1], tf.float32)
 
 def cond(i,j,a,b,x):
     return tf.less(i,256)
@@ -41,7 +42,26 @@ def _remap_histogram_level(image, style):
     image_histogram = get_hist_from_img(image)
     style_histogram = get_hist_from_img(style)
 
+    style_histogram_1xN = tf.reshape(style_histogram, shape=(1,-1))
+    ones_Nx1 = tf.constant(np.ones((256,1)), dtype=tf.float32)
+    style_repeated_NxN = tf.matmul(ones_Nx1, style_histogram_1xN)
 
+    dists = -tf.abs(style_repeated_NxN - tf.reshape(image_histogram, (-1,1)))
+    _,indices = tf.nn.top_k(dists, k=1)
+
+    image_one_hot = tf.cast(tf.one_hot(tf.reshape(image, (-1,)), 256), tf.int32)
+    remapped_img = tf.matmul(image_one_hot, indices)
+
+    return tf.reshape(remapped_img, tf.shape(image))
+
+def _remap_histogram_level_previous(image, style):
+    image = tf.cast(image, tf.int32)
+    style = tf.cast(style, tf.int32)
+
+    image_histogram = get_hist_from_img(image)
+    style_histogram = get_hist_from_img(style)
+
+    
     i = tf.constant(0)
     j = tf.constant(0)
     x = tf.constant([], dtype=tf.int32)
@@ -55,7 +75,7 @@ def _remap_histogram_level(image, style):
 
     remapped_img = tf.map_fn(get_map_fn(hist_mapping), tf.reshape(image, (-1,)))
 
-    return tf.reshape(remapped_img, image.get_shape())
+    return tf.reshape(remapped_img, tf.shape(image))
 
 
 def _load_image(filename, size=None):
@@ -81,13 +101,13 @@ def main():
     im1_tf = tf.constant(im1, dtype=tf.int32)
     im2_tf = tf.constant(im2, dtype=tf.int32)
 
-   
+
 
     im3_tf = remap_histogram(im1_tf, im2_tf)
-
+ 
     with tf.Session() as sess:
         im3 = sess.run(im3_tf)
-    
+
     im3 = im3.astype(np.uint8)
     plt.imsave(outname, im3, format=outname[:-3])
 

@@ -7,6 +7,7 @@ from tensorflow.contrib.opt import ScipyOptimizerInterface
 import h5py
 import numpy as np
 import tensorflow as tf
+import histogram_match
 
 
 class NeuralStyle:
@@ -52,7 +53,8 @@ class NeuralStyle:
             style_layers='conv1_1,conv2_1,conv3_1,conv4_1,conv5_1',
             style_weight=1e2,
             tv_weight=1e-3,
-            optimizer='Adam'):
+            optimizer='Adam',
+            hist_weight=1e-3):
         self._content_image = content_image
         self._content_layers = content_layers.split(',')
         self._content_weight = content_weight
@@ -69,6 +71,7 @@ class NeuralStyle:
         self._nodes = {}
         self._step_counter = 0
         self._optimizer = optimizer
+        self._hist_weight = hist_weight
 
 
     def run(self):
@@ -84,13 +87,23 @@ class NeuralStyle:
         self._output_shape = content.shape
         self._build_vgg19(image)
         self._add_gramians()
-        with tf.Session() as sess:
+
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        with tf.Session(config=config) as sess:
             # Calculate loss function
             sess.run(tf.global_variables_initializer())
             with tf.name_scope('losses'):
                 style_losses = self._setup_style_losses(sess, image, style)
                 content_losses = self._setup_content_losses(sess, image, content)
-                losses = content_losses+style_losses
+                
+                losses = content_losses + style_losses
+                
+                if self._hist_weight > 0:
+                    with tf.name_scope('histogram'), tf.device('/cpu:0'):
+                        hist_loss = self._setup_histogram_loss(image, style, sess)
+                    losses += hist_loss
+
                 image.set_shape(content.shape) # tv loss expects explicit shape
                 if self._tv_weight:
                     tv_loss = tf.image.total_variation(image[0])
@@ -101,7 +114,7 @@ class NeuralStyle:
 
             # Set optimizator
             if self._optimizer == 'Adam':
-                opt = tf.train.AdamOptimizer(1).minimize(loss)
+                opt = tf.train.AdamOptimizer(10).minimize(loss)
             
                 sess.run(tf.global_variables_initializer())
                 self._set_initial_image(sess, image, content)
@@ -168,6 +181,15 @@ class NeuralStyle:
         vgg_layers = [name for _, name, _ in NeuralStyle.VGG19_NO_FC]
         return max(vgg_layers.index(layer) for layer in useful_layers)
 
+    def _setup_histogram_loss(self, image, style, sess):
+        image_clipped = tf.clip_by_value(tf.cast(image[0] + NeuralStyle.VGG19_MEAN_BGR, tf.int32), 0, 255)
+        style_clipped = tf.clip_by_value(tf.cast(style[0] + NeuralStyle.VGG19_MEAN_BGR, tf.int32), 0, 255)
+
+        matched = histogram_match.remap_histogram(image_clipped, style_clipped)
+        matched = tf.cast(matched, tf.float32)
+        loss = tf.reduce_mean(tf.squared_difference(matched, image))
+        loss = tf.multiply(loss, self._hist_weight)
+        return [loss]
 
     def _setup_style_losses(self, sess, image, image_data):
         losses = []
