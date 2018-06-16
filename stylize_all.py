@@ -47,7 +47,7 @@ def dpa2(c_path, s_path, m_path, md_path, o_path, i):
             '-output_image', o_path_interres,
             '-print_iter', '100', '-save_iter', '100'])
     
-    subprocess.call(['th', 'neural_paint.lua',
+    subprocess.check_output(['th', 'neural_paint.lua',
             '-content_image', c_path,
             '-style_image', s_path,
             '-tmask_image', m_path,
@@ -60,7 +60,15 @@ def dpa2(c_path, s_path, m_path, md_path, o_path, i):
             '-num_iterations', '1000'])
 
 def photographic(c_path, s_path, m_path, md_path, o_path, i):
-    pass
+    subprocess.check_output(['python', 'deep_photostyle.py', 
+        '--content_image_path', c_path,
+        '--style_image_path', s_path,
+        '--content_seg_path', m_path,
+        '--style_seg_path', m_path,
+        '--output_image', o_path,
+        '--max_iter', '700',
+        '--style_option', '2',
+        '--serial', os.path.dirname(o_path)])
 
 algorithms = [gatys, gatys_histogram, dpa1, dpa2, photographic]
 algo_names = ['gatys', 'gatys_histogram', 'dpa1', 'dpa2', 'photo']
