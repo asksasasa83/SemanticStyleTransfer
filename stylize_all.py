@@ -66,12 +66,15 @@ def photographic(c_path, s_path, m_path, md_path, o_path, i):
         '--content_seg_path', m_path,
         '--style_seg_path', m_path,
         '--output_image', o_path,
-        '--max_iter', '700',
+        '--max_iter', '500',
         '--style_option', '2',
         '--serial', os.path.dirname(o_path)])
 
 algorithms = [gatys, gatys_histogram, dpa1, dpa2, photographic]
 algo_names = ['gatys', 'gatys_histogram', 'dpa1', 'dpa2', 'photo']
+
+def maybe_create_subfolders(folder):
+    os.makedirs(folder, exist_ok=True)
 
 def transfer_folder(folder):
     c_path = os.path.join(folder, 'content.jpg')
@@ -79,8 +82,10 @@ def transfer_folder(folder):
     m_path = os.path.join(folder, 'mask.jpg')
     md_path = os.path.join(folder, 'mask_dilated.jpg')
     
-    for i, algo,name in enumerate(zip(algorithms, algo_names)):
+    for i, (algo,name) in enumerate(zip(algorithms, algo_names)):
         o_path = os.path.join(folder, name, 'output.jpg')
+        maybe_create_subfolders(os.path.dirname(o_path))
+        
         try:
             print("Computing algorithm {} of folder {}".format(i, folder))
             algo(c_path, s_path, m_path, md_path, o_path, i)
