@@ -37,7 +37,7 @@ def dpa1(c_path, s_path, m_path, md_path, o_path, i):
             '-print_iter', '100', '-save_iter', '100'])
 
 def dpa2(c_path, s_path, m_path, md_path, o_path, i):
-    o_path_interres = '.'.join(o_path.split('.')[:-1]) + 'inter_res.jpg
+    o_path_interres = '.'.join(o_path.split('.')[:-1]) + 'inter_res.jpg'
     subprocess.check_output(['th', 'neural_gram.lua',
             '-content_image', c_path,
             '-style_image', s_path,
