@@ -12,7 +12,8 @@ def gatys(c_path, s_path, m_path, md_path, o_path, i):
             '--num_iterations', '1000', 
             '--style_image', s_path, 
             '--style_weight', '500', 
-            '--hist_weight', '0'], 
+            '--hist_weight', '0',
+            '--output_image', o_path], 
                 stderr=subprocess.STDOUT)
 
 def gatys_histogram(c_path, s_path, m_path, md_path, o_path, i):
@@ -23,7 +24,8 @@ def gatys_histogram(c_path, s_path, m_path, md_path, o_path, i):
             '--num_iterations', '1000', 
             '--style_image', s_path, 
             '--style_weight', '500', 
-            '--hist_weight', '0.01'], 
+            '--hist_weight', '0.01',
+            '--output_image', o_path], 
                 stderr=subprocess.STDOUT)
 
 def dpa1(c_path, s_path, m_path, md_path, o_path, i):
