@@ -11,8 +11,6 @@ import histogram_match
 
 
 class NeuralStyle:
-
-    # https://gist.github.com/ksimonyan/211839e770f7b538e2d8#file-readme-md
     VGG19_MEAN_BGR = (103.939, 116.779, 123.68)
     VGG19_NO_FC = (
         ('conv', 'conv1_1', (3, 3, 3, 64)),
