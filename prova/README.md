@@ -98,7 +98,7 @@ artworks.
 ![Image = Content + Style](https://latex.codecogs.com/png.latex?Image%20%3D%20Content%20%2B%20Style "Image = Content + Style")
 
 ![Image as content +
-style.[]{data-label="fig:nst_review_1"}](img/ics.png){width="\linewidth"}
+style.[]{data-label="fig:nst_review_1"}](img/ics.png)
 
 The key idea behind this algorithm is to start from random noise as the
 initial result and then change the values of pixels iteratively until
@@ -217,7 +217,7 @@ Li and Wand [@MRF_patch] built a nearest neighbors Markov Random Field
 patch.
 
 ![Example of Nearest Neighbour Field for finding similar
-patches.[]{data-label="fig:nnf"}](img/match.jpg){width="\linewidth"}
+patches.[]{data-label="fig:nnf"}](img/match.jpg)
 
 In this way we avoid artifacts due to inconsistent style matches. The
 matching of pixels from I to S at layer
@@ -262,7 +262,7 @@ mapping of the patches between the images.
 
 ![Nearest Neighbour Field built upon the bidirectional constraint
 defined in [@DBLP:journals/corr/LiaoYYHK17], explained in
-\[bidir\].[]{data-label="fig:bidir"}](img/bidir.png){width="\linewidth"}
+\[bidir\].[]{data-label="fig:bidir"}](img/bidir.png)
 
 ### Enforce spatial consistency {#harmonization}
 
@@ -286,7 +286,7 @@ patch.
 ![Nearest neighbor field built according to [@luan2018deep], explained
 in \[harmonization\]. Similar neighboring patches help in finding a
 better
-match.[]{data-label="fig:harmony"}](img/van_ben_model_2.png){width="\linewidth"}
+match.[]{data-label="fig:harmony"}](img/van_ben_model_2.png)
 
 Style transfer related challenges
 ---------------------------------
@@ -336,7 +336,7 @@ on several content and style choices.
 Experiment 1: Gatys parameters comparison
 -----------------------------------------
 
-![image](./content_style_difference.pdf){width="\textwidth"}
+![image](./content_style_difference.png)
 
 This experiment aims at exploring the meaning of the parameters involved
 in style transfer in the simple and more intuitive implementation of
@@ -391,17 +391,8 @@ exceptions. More complex approaches (PHOTO, MRF and DPA) work really
 well on a limited number of images, but fail to generalize on every
 domain. Results can be seen in figure \[fig:exp2\]
 
-![image](./comparisons.pdf)
+![image](./img/comparisons.png)
 
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
 
 Conclusion
 ==========
@@ -417,30 +408,12 @@ complex model was necessary in the first place.
 More comparisons
 ================
 
-![image](./comparisons_supplementary.pdf)
-
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
+![image](./img/comparisons_supplementary.png)
 
 Histogram loss
 ==============
 
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
-
-[0.19]{}
+![image](./img/bean_hist.png)
 
 Histogram loss limits the difference between the histogram of the output
 image and the histogram of the output image reconstructed through
@@ -451,13 +424,7 @@ image.
 Total variation loss
 ====================
 
-[0.22]{}
-
-[0.24]{}
-
-[0.24]{}
-
-[0.24]{}
+![image](./img/tub_tv.png)
 
 Total variation loss limits the difference of activations of adjacent
 pixels and thus produces smoother outputs.
